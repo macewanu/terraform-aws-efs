@@ -60,7 +60,11 @@ resource "aws_efs_access_point" "default" {
   file_system_id = join("", aws_efs_file_system.default.*.id)
 
   dynamic "posix_user" {
-    for_each = local.posix_users[each.key] != null ? ["true"] : []
+    for_each = (
+      local.posix_users[each.key] != null
+      && contains(keys(local.posix_users[each.key]), "gid")
+      && contains(keys(local.posix_users[each.key]), "uid")
+    ) ? ["true"] : []
 
     content {
       gid            = local.posix_users[each.key]["gid"]
