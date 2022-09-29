@@ -87,7 +87,16 @@ resource "aws_efs_access_point" "default" {
     }
   }
 
-  tags = module.this.tags
+  tags = merge(
+    module.this.tags,
+    {
+      "Name" = format(
+        "%s%s",
+        module.this.tags["Name"],
+        each.key != "" ? format("-%s", each.key) : ""
+      )
+    }
+  )
 }
 
 module "security_group" {
